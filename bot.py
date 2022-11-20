@@ -1,31 +1,12 @@
-import nextcord
 from nextcord import Interaction, SlashOption, Intents
 from nextcord.ext import commands
 import aiomlbb
 import sqlite3
-import os
 import requests
-import time
-import asyncio
-import sys
 
-
-async def ainput(string: str) -> str:
-    await asyncio.get_event_loop().run_in_executor(
-        None, lambda s=string: sys.stdout.write(s + ' '))
-    return await asyncio.get_event_loop().run_in_executor(
-        None, sys.stdin.readline)
-
-
-async def console(ctx, channel=None):
-    x = await ainput(f"{channel}>> ")
-    if x == "set":
-        n == 0
-        for i in ctx.guild.channels:
-            print(f"{n} {i}")
-        num = await ainput(">> ")
-        channel = ctx.guild.channels[num]
-    return x, channel
+my_intents = Intents.default()
+my_intents.message_content = True
+bot = commands.Bot(command_prefix='$', intents=my_intents)
 
 
 async def add_to_db(discord_name, discord_id, user_id, zone_id):
@@ -46,47 +27,10 @@ async def add_to_db(discord_name, discord_id, user_id, zone_id):
         return {'status': False, 'message': 'Invalid Login Credentials'}
 
 
-my_intents = Intents.default()
-my_intents.message_content = True
-bot = commands.Bot(command_prefix='$', intents=my_intents)
-
-
 @bot.command()
 async def ping(ctx):
     await ctx.send('hi')
 
-
-@bot.command()
-async def play(ctx):
-    if ctx.voice_client is not None:
-        await ctx.voice_client.move_to(channel)
-    playlist = os.listdir('Music')
-    playlist.sort()
-    music = []
-    for i in playlist:
-        source = nextcord.FFmpegOpusAudio("Music/" + i)
-        music.append(source)
-    if ctx.voice_client.is_connected():
-        await ctx.voice_client.play(source)
-        await ctx.send(f'Playing in {ctx.voice_client.channel}')
-    else:
-        ctx.send('Not Connected')
-
-
-@bot.command()
-async def leave(ctx):
-    if ctx.voice_client is not None:
-        return await ctx.voice_client.disconnect()
-    else:
-        await ctx.send("Not In a channel")
-
-
-@bot.command()
-async def pingofdeath(ctx, count=5, *args):
-    for i in range(count):
-        for victim in args:
-            await ctx.send(victim)
-        time.sleep(0.2)
 
 
 @bot.event
@@ -126,4 +70,5 @@ async def idea(
     await interaction.response.send_message("Done")
 
 
-bot.run('OTk2NTUzMjkwNzg1NDk3MTc5.G_wtgP.VBniNkoi--JA_h8iNla18yMB9E0lp_2QcFmDbk')
+if __name__ == '__main__':
+    bot.run('OTk2NTUzMjkwNzg1NDk3MTc5.G_wtgP.VBniNkoi--JA_h8iNla18yMB9E0lp_2QcFmDbk')
