@@ -1,3 +1,5 @@
 /registry.db
-/Music/
+/Music/*
 /.pytest_cache/
+/venv
+/.idea/
