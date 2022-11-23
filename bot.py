@@ -2,9 +2,13 @@ import time
 
 from nextcord import Interaction, SlashOption, Intents
 from nextcord.ext import commands
-import aiomlbb
-import sqlite3
+
+import DataBase
+from DataBase import add_to_db
+import MLBBApi
+import ApexApi
 import requests
+
 
 my_intents = Intents.default()
 my_intents.message_content = True
@@ -24,24 +28,6 @@ class Settings:
 
 
 settings = Settings()
-
-
-async def add_to_db(discord_name, discord_id, user_id, zone_id):
-    cli = aiomlbb.MLBBApi(user_id, zone_id)
-    data = await cli.get('username')
-    if data['status'] == 'success':
-        con = sqlite3.connect('registry.db')
-        cur = con.cursor()
-        CREDS = (discord_name, discord_id, int(user_id), int(zone_id))
-        for row in cur.execute('SELECT * FROM Registry'):
-            if row == CREDS:
-                return {'status': False, 'message': 'Already Registered'}
-        cur.execute('INSERT INTO Registry VALUES (?, ?, ?, ?)', CREDS)
-        con.commit()
-        con.close()
-        return {'status': True, 'message': 'Registered Successfully'}
-    else:
-        return {'status': False, 'message': 'Invalid Login Credentials'}
 
 
 @bot.command()
@@ -84,12 +70,13 @@ async def on_message(message):
     print(f"{message.author}: {message.content}")
 
 
-@bot.slash_command(description="Registers Your Discord id with your Mobile Legends Id")
-async def register(
+@bot.slash_command(name="register mlbb", description="Registers Your Discord id with your Mobile Legends Id")
+async def register_mlbb(
         interaction: Interaction,
         uid: str = SlashOption(description="User ID", required=True),
         zid: str = SlashOption(description="Zone ID", required=True)
 ):
+    db = DataBase.DataBase(interaction.guild_id)
     added_status = await add_to_db(interaction.user.name, interaction.user.id, uid, zid)
     await interaction.response.send_message(added_status['message'])
 

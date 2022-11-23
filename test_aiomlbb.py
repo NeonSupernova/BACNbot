@@ -1,5 +1,5 @@
 import pytest
-import aiomlbb
+
 uid = 27635464
 zid = 5009
 
