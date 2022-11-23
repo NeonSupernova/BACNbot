@@ -1,6 +1,6 @@
-/registry.db
 /Music/*
 /.pytest_cache/
 /venv
 /.idea/
 /__pycache__/
+/dbs/registry.db
