@@ -1,5 +1,8 @@
 import time
 
+import openai
+openai.api_key = "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"
+
 from nextcord import Interaction, SlashOption, Intents
 from nextcord.ext import commands
 
@@ -85,6 +88,10 @@ async def register_mlbb(
 async def apex_stats():
     pass
 
+@bot.slash_command(description="Uses gpt-3 to answer questions")
+async def query(interaction: Interaction, question: str = SlashOption(description="Your Question", required=True)):
+    data = openai.Completion.create(model="text-davinci-003",prompt=question,temperature=0,max_tokens=250,top_p=1,frequency_penalty=0.0,presence_penalty=0.0)
+    await interaction.response.send_message(data)
 
 @bot.slash_command(description="Send your ideas to the Trello board")
 async def idea(
