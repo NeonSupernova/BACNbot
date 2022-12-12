@@ -32,6 +32,16 @@ class DataBase:
 
     async def add_to_apex_db(self, discord_id, player_id: int, platform):
         apex = ApexApi(player_id, platform)
+        if apex.username is '':
+            return 'Bad User ID or Zone ID'
+        else:
+            CREDS = (discord_id, int(player_id), int(platform))
+            for row in self.cur.execute('SELECT * FROM APEX_REGISTRY'):
+                if row == CREDS:
+                    return 'Already registered'
+            self.cur.execute('INSERT INTO APEX_REGISTRY VALUES (?, ?, ?)', CREDS)
+            self.con.commit()
+            return 'Successfully Added'
 
     async def disconnect(self):
         self.con.commit()

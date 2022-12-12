@@ -7,6 +7,7 @@ class ApexApi:
         self.pid = pid
         self.platform = platform
         self.data = self.get()
+        self.username = ""
 
     async def get(self):
         api_key = "8f3f57203dfaeae9f1497c9ac8d10b4c"
