@@ -1,5 +1,4 @@
 import time
-import openai
 import DataBase
 import MLBBApi
 import ApexApi
@@ -95,24 +94,6 @@ async def register_mlbb(
 @bot.slash_command(description="Fetches Apex Stats (WIP)")
 async def apex_stats():
     pass
-
-
-@bot.slash_command(description="Uses gpt-3 to answer questions")
-async def query(
-    interaction: Interaction,
-    question: str = SlashOption(description="Your Question", required=True),
-):
-    data = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=question,
-        temperature=0,
-        max_tokens=250,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
-    )
-    response = 'Q: %s\nA: %s' % (question, data["choices"][0]["text"].replace("\n", "", 2))
-    await interaction.response.send_message(response)
 
 
 @bot.slash_command(description="Send your ideas to the Trello board")
