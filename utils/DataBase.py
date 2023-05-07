@@ -1,8 +1,7 @@
 import sqlite3
 import os
 
-from ApexApi import ApexApi
-from MLBBApi import MLBBApi
+from . import ApexApi, MLBBApi
 
 
 class DataBase:
@@ -19,7 +18,7 @@ class DataBase:
 
     async def add_to_mlbb_db(self, discord_id, user_id: int, zone_id: int):
         mlbb = MLBBApi(user_id, zone_id)
-        if mlbb.username is '':
+        if mlbb.username == '':
             return 'Bad User ID or Zone ID'
         else:
             CREDS = (discord_id, int(user_id), int(zone_id))
@@ -32,7 +31,7 @@ class DataBase:
 
     async def add_to_apex_db(self, discord_id, player_id: int, platform):
         apex = ApexApi(player_id, platform)
-        if apex.username is '':
+        if apex.username == '':
             return 'Bad User ID or Zone ID'
         else:
             CREDS = (discord_id, int(player_id), int(platform))

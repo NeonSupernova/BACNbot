@@ -1,18 +1,16 @@
 import time
-import openai
-import DataBase
-import MLBBApi
-import ApexApi
+import utils
 import requests
 
 from nextcord import Interaction, SlashOption, Intents
 from nextcord.ext import commands
 
+with open(".env", 'r') as f:
+    BOT_TOKEN = f.readline()
 
 my_intents = Intents.default()
 my_intents.message_content = True
 bot = commands.Bot(command_prefix="$", intents=my_intents)
-openai.api_key = "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"
 
 
 class Settings:
@@ -87,7 +85,7 @@ async def register_mlbb(
     uid: int = SlashOption(description="User ID", required=True),
     zid: int = SlashOption(description="Zone ID", required=True),
 ):
-    db = DataBase.DataBase(interaction.guild_id)
+    db = utils.DataBase(interaction.guild_id)
     added_status = await db.add_to_mlbb_db(interaction.user.id, uid, zid)
     await interaction.response.send_message(added_status["message"])
 
@@ -95,24 +93,6 @@ async def register_mlbb(
 @bot.slash_command(description="Fetches Apex Stats (WIP)")
 async def apex_stats():
     pass
-
-
-@bot.slash_command(description="Uses gpt-3 to answer questions")
-async def query(
-    interaction: Interaction,
-    question: str = SlashOption(description="Your Question", required=True),
-):
-    data = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=question,
-        temperature=0,
-        max_tokens=250,
-        top_p=1,
-        frequency_penalty=0.0,
-        presence_penalty=0.0,
-    )
-    response = 'Q: %s\nA: %s' % (question, data["choices"][0]["text"].replace("\n", "", 2))
-    await interaction.response.send_message(response)
 
 
 @bot.slash_command(description="Send your ideas to the Trello board")
@@ -136,4 +116,4 @@ async def spam_kill(interaction: Interaction):
 
 
 if __name__ == "__main__":
-    bot.run("OTk2NTUzMjkwNzg1NDk3MTc5.G_wtgP.VBniNkoi--JA_h8iNla18yMB9E0lp_2QcFmDbk")
+    bot.run(BOT_TOKEN)

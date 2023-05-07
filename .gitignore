@@ -1,7 +1,14 @@
+# Test and local dev dirs
 /Music/*
+/dbs/registry.db
 /.pytest_cache/
 /venv
-/.idea/
+/.venv
 /__pycache__/
-/dbs/registry.db
+.env
+
+# IDE Setting dirs
+/.idea/
+/.fleet/
+
 
