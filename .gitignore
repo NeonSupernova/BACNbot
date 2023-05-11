@@ -6,6 +6,7 @@
 /.venv
 /__pycache__/*
 .env
+*.aternos
 
 # IDE Setting dirs
 /.idea/
