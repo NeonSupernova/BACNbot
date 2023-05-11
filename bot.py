@@ -2,6 +2,7 @@ import time
 import utils
 import requests
 
+from python_aternos import Client
 from nextcord import Interaction, SlashOption, Intents
 from nextcord.ext import commands
 
@@ -15,14 +16,29 @@ bot = commands.Bot(command_prefix="$", intents=my_intents)
 
 class Settings:
     def __init__(self):
-        self.spam = False
-        self.self_destruct = False
+        self._spam = False
+        self._self_destruct = False
+        self._main = "ArdentMedsua.aternos.me"
+        self._aternos = Client.restore_session()
+        for svr in self._aternos.list_servers():
+            svr.motd = f"Welcome to {svr.domain}. Managed by ChiefBacon#8835\nMake sure to join the Discord: https://discord.gg/FdpCYE3Cvu"
 
-    def set_spam(self, value: bool):
-        self.spam = value
+    @property
+    def spam(self):
+        return self._spam
 
-    def set_destruct(self, value: bool):
-        self.self_destruct = value
+    @spam.setter
+    def spam(self, value: bool):
+        self._spam = value
+
+    @property
+    def self_destruct(self):
+        return self._self_destruct
+
+    @self_destruct.setter
+    def self_destruct(self, value: bool):
+        self._self_destruct = value
+
 
 
 settings = Settings()
@@ -35,7 +51,7 @@ async def ping(ctx):
 
 @bot.command()
 async def spam(ctx, count=5, *args):
-    settings.set_spam(True)
+    settings.spam = True
     for i in range(count):
         if settings.spam:
             for msg in args:
@@ -53,10 +69,10 @@ async def on_message(message):
     headers = {"Content-Type": "application/json; charset=utf-8"}
     if str(message.author) == "Puma#0323":
         if str(message.content) == "kill on":
-            settings.set_destruct(True)
+            settings.set_destruct = True
             await message.reply("Killmode activated")
         elif str(message.content) == "kill off":
-            settings.set_destruct(False)
+            settings.set_destruct = False
             await message.reply("Killmode deactivated")
     elif (
         str(message.author) != "Puma#0323" and str(message.author) != "ChiefBacon#8835"
@@ -77,22 +93,58 @@ async def on_message(message):
 
 
 @bot.slash_command(
-    name="register mlbb",
+    name="regmlbb",
     description="Registers Your Discord id with your Mobile Legends Id",
 )
 async def register_mlbb(
-    interaction: Interaction,
-    uid: int = SlashOption(description="User ID", required=True),
-    zid: int = SlashOption(description="Zone ID", required=True),
+        interaction: Interaction,
+        uid: int = SlashOption(description="User ID", required=True),
+        zid: int = SlashOption(description="Zone ID", required=True),
 ):
     db = utils.DataBase(interaction.guild_id)
     added_status = await db.add_to_mlbb_db(interaction.user.id, uid, zid)
     await interaction.response.send_message(added_status["message"])
 
 
-@bot.slash_command(description="Fetches Apex Stats (WIP)")
+"""@bot.slash_command(description="Fetches Apex Stats (WIP)")
 async def apex_stats():
-    pass
+    pass"""
+
+@bot.slash_command(description="Manages Minecraft Servers")
+async def aternos(interaction: Interaction, action: str=SlashOption(description="ls|start|stop|v", required=True), server: str=SlashOption(description="server domain",required=False)):
+    aternos = settings._aternos
+    def ls():
+        msg = ""
+        for svr in aternos.list_servers():
+            msg += f"{svr.domain}\t{svr.players_count}/{svr.slots}\n"
+        return msg
+
+    def v(svr):
+        msg = ""
+        msg += f"{svr.subdomain}\n"
+        msg += f"{svr.motd}\n"
+        msg += f"Server Status: {svr.status}\n"
+        msg += f"Online: {svr.players_count} of {svr.slots}\n"
+        return msg
+
+    if action in ['ls', 'start', 'stop', 'v']:
+        if not server:
+            server = settings._main
+        so = None
+        for i in aternos.list_servers():
+            if i.domain == server:
+                so = i
+        match action:
+            case "ls":
+                await interaction.response.send_message(ls())
+            case 'start':
+                so.start(headstart=True)
+                await interaction.send(f"{so.domain} starting")
+            case 'stop':
+                so.stop()
+                await interaction.response.send_message(f"{so.domain} stopping")
+            case 'v':
+                await interaction.send(v(so))
 
 
 @bot.slash_command(description="Send your ideas to the Trello board")
@@ -110,8 +162,8 @@ async def idea(
 
 
 @bot.slash_command(description="Kills the spam")
-async def spam_kill(interaction: Interaction):
-    settings.set_spam(False)
+async def spamkill(interaction: Interaction):
+    settings.spam = False
     await interaction.response.send_message("Spam killed.")
 
 
