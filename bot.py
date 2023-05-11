@@ -19,7 +19,7 @@ class Settings:
         self._spam = False
         self._self_destruct = False
         self._main = "ArdentMedsua.aternos.me"
-        self._aternos = Client.restore_session()
+        self._aternos = Client.restore_session(file="ChiefBacon8835.aternos")
         for svr in self._aternos.list_servers():
             svr.motd = f"Welcome to {svr.domain}. Managed by ChiefBacon#8835\nMake sure to join the Discord: https://discord.gg/FdpCYE3Cvu"
 
