@@ -1,27 +1,26 @@
+import os
 import time
 import utils
 import requests
 
-from python_aternos import Client
+from dotenv import load_dotenv
 from nextcord import Interaction, SlashOption, Intents
 from nextcord.ext import commands
 
-with open(".env", 'r') as f:
-    BOT_TOKEN = f.readline()
-
-my_intents = Intents.default()
-my_intents.message_content = True
-bot = commands.Bot(command_prefix="$", intents=my_intents)
-
+load_dotenv()
 
 class Settings:
     def __init__(self):
         self._spam = False
         self._self_destruct = False
-        self._main = "ArdentMedsua.aternos.me"
-        self._aternos = Client.restore_session(file="ChiefBacon8835.aternos")
-        for svr in self._aternos.list_servers():
-            svr.motd = f"Welcome to {svr.domain}. Managed by ChiefBacon#8835\nMake sure to join the Discord: https://discord.gg/FdpCYE3Cvu"
+        self.intents = self._load_intents()       
+
+    def _load_intents(self) -> Intents:
+        intents = Intents.default()
+        intents.presences = True
+        intents.members = True
+        intents.message_content = True
+        return intents
 
     @property
     def spam(self):
@@ -39,10 +38,14 @@ class Settings:
     def self_destruct(self, value: bool):
         self._self_destruct = value
 
+    @property
+    def token(self):
+        return os.getenv('BOT_TOKEN')
 
 
 settings = Settings()
 
+bot = commands.Bot(command_prefix="$", intents=settings.intents)
 
 @bot.command()
 async def ping(ctx):
@@ -168,4 +171,4 @@ async def spamkill(interaction: Interaction):
 
 
 if __name__ == "__main__":
-    bot.run(BOT_TOKEN)
+    bot.run(settings.token)
